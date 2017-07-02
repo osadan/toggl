@@ -1,4 +1,4 @@
-## report time in toggle 
+## Report time in toggle 
 
 This project expose single function in order to register single time entry in toggl . 
 
