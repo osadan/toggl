@@ -1,3 +1,4 @@
+process.env.NODE_ENV = "dev";
 const config = require('config');
 const request = require('request');
 const opts = require('node-getopt').create([
