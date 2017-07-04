@@ -5,6 +5,7 @@ const opts = require('node-getopt').create([
 	['s','start=s','start time - format 00:00'],
 	['e','end=e','end time - format 00:00'],
 	['d','date=d','date - format DD-MM-YYYY'],
+	['h','help','display the help'],
 	['p','project=p','project name']
 ])
 .bindHelp()
