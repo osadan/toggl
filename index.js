@@ -18,7 +18,9 @@ module.exports = {
 };
 
 const result  = timeEntry(config.get(opts.options.project),opts.options.start,opts.options.end,opts.options.date);
-if(result.body.time_entries){
+
+if(result.body.time_entry){
+	
 	send(result);
 }
 
@@ -97,9 +99,11 @@ function timeEntry(pid,start,end,date){
 }
 
 function send(data){
+	console.log('data');
 	const req = Object.assign({},data);
 	request(req,(err,response,data) => {
 		if(err) {
+			console.log(err);
 			throw err;
 		}
 
