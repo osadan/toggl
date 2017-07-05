@@ -99,7 +99,6 @@ function timeEntry(pid,start,end,date){
 }
 
 function send(data){
-	console.log('data');
 	const req = Object.assign({},data);
 	request(req,(err,response,data) => {
 		if(err) {
