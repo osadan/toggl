@@ -6,7 +6,8 @@ const opts = require('node-getopt').create([
 	['e','end=e','end time - format 00:00'],
 	['d','date=d','date - format DD-MM-YYYY'],
 	['h','help','display the help'],
-	['p','project=p','project name']
+	['p','project=p','project name'],
+	['f','fullday=f','is full day' ]
 ])
 .bindHelp()
 .parseSystem();
@@ -17,12 +18,31 @@ module.exports = {
 	send
 };
 
-const result  = timeEntry(config.get(opts.options.project),opts.options.start,opts.options.end,opts.options.date);
 
-if(result.body.time_entry){
-	
-	send(result);
+if(opts.options.fullday) {
+	const dateArray = opts.options.date.split("-");
+	let lunchStart = "13:00"; //new Date(dateArray[2],dateArray[1] - 1,dateArray[0]);
+	let lunchEnd = "13:30";//new Date(lunchStart.valueOf());
+	//lunchStart.setUTCHours("13","00");
+	//lunchEnd.setUTCHours("13","30");
+    //lunchStart = setTimezoneString(lunchStart)
+    //console.log(lunchStart);
+	//lunchEnd = setTimezoneString(lunchEnd);
+
+	const lunchPid = config.get("launch");
+	send(timeEntry(config.get(opts.options.project),opts.options.start,lunchStart,opts.options.date));
+    send(timeEntry(lunchPid,lunchStart,lunchEnd,opts.options.date));
+    send(timeEntry(config.get(opts.options.project),lunchEnd,opts.options.end,opts.options.date));
 }
+else{
+	const result  = timeEntry(config.get(opts.options.project),opts.options.start,opts.options.end,opts.options.date);
+    if(result.body.time_entry){
+
+        send(result);
+    }
+}
+
+
 
 function authenticate (){
 	const req = {
