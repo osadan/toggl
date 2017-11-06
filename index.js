@@ -7,7 +7,8 @@ const opts = require('node-getopt').create([
 	['d','date=d','date - format DD-MM-YYYY'],
 	['h','help','display the help'],
 	['p','project=p','project name'],
-	['f','fullday=f','is full day' ]
+	['f','fullday=f','is full day' ],
+	['c','desc=c','description of the activity']
 ])
 .bindHelp()
 .parseSystem();
@@ -30,12 +31,12 @@ if(opts.options.fullday) {
 	//lunchEnd = setTimezoneString(lunchEnd);
 
 	const lunchPid = config.get("launch");
-	send(timeEntry(config.get(opts.options.project),opts.options.start,lunchStart,opts.options.date));
-    send(timeEntry(lunchPid,lunchStart,lunchEnd,opts.options.date));
-    send(timeEntry(config.get(opts.options.project),lunchEnd,opts.options.end,opts.options.date));
+	send(timeEntry(config.get(opts.options.project),opts.options.start,lunchStart,opts.options.date,opts.options.desc));
+    send(timeEntry(lunchPid,lunchStart,lunchEnd,opts.options.date,"lunch"));
+    send(timeEntry(config.get(opts.options.project),lunchEnd,opts.options.end,opts.options.date,opts.options.desc));
 }
 else{
-	const result  = timeEntry(config.get(opts.options.project),opts.options.start,opts.options.end,opts.options.date);
+	const result  = timeEntry(config.get(opts.options.project),opts.options.start,opts.options.end,opts.options.date,opts.options.desc);
     if(result.body.time_entry){
 
         send(result);
@@ -59,14 +60,15 @@ function authenticate (){
 }
 
 function setTimezoneString(date){
- 	return date.toISOString().replace('Z',config.get('timezone'));//"+03:00"
+ 	console.log(date)
+	return date.toISOString().replace('Z',config.get('timezone'));//"+03:00"
 }
 
 
 //authenticate();
 //time  format 00:00
 //date formay DD-MM-YYYY
-function timeEntry(pid,start,end,date){
+function timeEntry(pid,start,end,date,description){
 
 	if(!start && !end && !date && !pid){
 		throw Exception('At least one value must be defined');
@@ -86,12 +88,12 @@ function timeEntry(pid,start,end,date){
 
 	if(start){
 		const tmpStartArray = start.split(":");
-		startDate.setUTCHours(tmpStartArray[0],tmpStartArray[1]);
+		startDate.setHours(tmpStartArray[0],tmpStartArray[1]);
 	}
 
 	if(end){
 		const tmpEndArray = end.split(":");
-		endDate.setUTCHours(tmpEndArray[0],tmpEndArray[1]);
+		endDate.setHours(tmpEndArray[0],tmpEndArray[1]);
 	}
 
 	const duration = Math.abs(endDate - startDate) / 1000;
@@ -108,13 +110,15 @@ function timeEntry(pid,start,end,date){
 			"time_entry": {
 				created_with: config.get('app_name'),
 				pid: pid,
-				start: setTimezoneString(startDate),
+				start: startDate, //setTimezoneString(startDate),
 				duration: duration ,
-				end:setTimezoneString(endDate)
+				end:endDate, //setTimezoneString(endDate),
+				description: description
 			}
 		}
 
 	};
+	console.log(req);
 	return req;
 }
 
